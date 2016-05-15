@@ -1,0 +1,78 @@
+
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script type="text/javascript">
+
+function GetData(suburb) {
+    var xhr = new XMLHttpRequest();
+    var url = "http://localhost:3000/api/v1/etas";
+    params = "suburb="+suburb;
+    xhr.open("POST", url, false);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send(params);
+
+    var result = JSON.parse(xhr.responseText);
+    return result;
+}
+
+$(function() {
+    
+    $('#container').highcharts({
+        title: {
+            text: 'Average ETA',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Source: NZTA Wellington',
+            x: -20
+        },
+        xAxis: {
+            title: {
+                text: 'Days'
+            },
+            categories: GetData('Melling')[0]
+        },
+        yAxis: {
+            title: {
+                text: 'Time in minutes'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: ' Minutes'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [{
+            name: 'Melling AM',
+            data: GetData('Melling')[1]
+        }, {
+            name: 'Porirua AM',
+            data: GetData('Porirua')[1]
+        }, {
+            name: 'Petone AM',
+            data: GetData('Petone')[1]
+        }, {
+            name: 'Manor Park',
+            data: GetData('Manor Park')[1]
+        }, {
+            name: 'Waikanae',
+            data: GetData('Waikanae')[1]
+        }]
+            
+    });
+});
+</script>

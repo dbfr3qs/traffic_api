@@ -9,6 +9,7 @@ class Api::V1::EtasController < ApplicationController
 		#logger.info params
 		@params = params
 		puts @params["suburb"]
-		render json: Database.return_data(@params["suburb"]), statis: 201
+		puts @params["period"]
+		render json: Database.return_data(@params["suburb"], @params["period"]), statis: 201
 	end
 end

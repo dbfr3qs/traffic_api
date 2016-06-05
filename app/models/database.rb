@@ -6,11 +6,11 @@ class Database
 	attr_accessor :DB 
 	attr_accessor :etas
 
-	def self.return_data(suburb, period)
+	def self.return_data(suburb, period, month)
 		@DB = Sequel.connect('sqlite://data.db')
 		@etas = @DB[:etas]
 		set = @etas.where(:suburb => suburb)
-		
+		@month = month
 		#binding.pry
 		items = Array.new
 			# create array of items (eta objects)
@@ -22,16 +22,16 @@ class Database
 		end
 		#binding.pry
 		# get the days in April that we have data for
-		days = items.select { |item| item.month == 5 }.map { |item| item.day.to_i }.uniq
+		days = items.select { |item| item.month == @month.to_i }.map { |item| item.day.to_i }.uniq
 		averages = Array.new
 		data = Array.new
 
 		# calculate average eta for each day
 		days.each do |day|
 			if period == "AM"
-				data = items.select { |item| item.day == day && item.month == 5 && item.hour.to_i < 12 }.map { |record| record.eta.to_i } # get etas
+				data = items.select { |item| item.day == day && item.month == @month.to_i && item.hour.to_i < 12 }.map { |record| record.eta.to_i } # get etas
 			else 
-				data = items.select { |item| item.day == day && item.month == 5 && item.hour.to_i >12 }.map { |record| record.eta.to_i } # get etas	
+				data = items.select { |item| item.day == day && item.month == @month.to_i && item.hour.to_i >12 }.map { |record| record.eta.to_i } # get etas	
 			end
 
 			unless data.count == 0 
@@ -41,7 +41,7 @@ class Database
   		
 		# get the actual day, mon tues, wed, etc
 		def self.dayOfWeek(day) 
-			theDate = Date.new(2016, 5, day)
+			theDate = Date.new(2016, @month.to_i, day)
 			theDate.strftime('%a')
 		end
 		

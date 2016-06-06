@@ -11,16 +11,14 @@ class Database
 		@etas = @DB[:etas]
 		set = @etas.where(:suburb => suburb)
 		@month = month
-		#binding.pry
 		items = Array.new
 			# create array of items (eta objects)
 		set.each do |record|
 			time = Time.parse(record[:time])
 			item = Item.new(time.day, time.month, time.year, time.hour, time.min, time.sec, record[:eta], record[:suburb])
-			#puts item.hour
 			items << item
 		end
-		#binding.pry
+		
 		# get the days in April that we have data for
 		days = items.select { |item| item.month == @month.to_i }.map { |item| item.day.to_i }.uniq
 		averages = Array.new
@@ -47,7 +45,7 @@ class Database
 		
 		dayNames = Array.new
 		days.each do |day|
-			dayNames << dayOfWeek(day) + " " + day.to_s 
+			dayNames << dayOfWeek(day) + " " + day.to_s
 		end
 
 		return dayNames.reverse, averages.reverse

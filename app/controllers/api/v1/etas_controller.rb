@@ -8,9 +8,9 @@ class Api::V1::EtasController < ApplicationController
 	def create
 		#logger.info params
 		@params = params
-		puts @params["suburb"]
-		puts @params["period"]
-		puts @params["month"]
+		#puts @params["suburb"]
+		#puts @params["period"]
+		#puts @params["month"]
 		render json: Database.return_data(@params["suburb"], @params["period"], @params["month"]), statis: 201
 	end
 end

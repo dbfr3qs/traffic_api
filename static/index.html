@@ -11,7 +11,7 @@
     <option value="2">Feb</option>
     <option value="3">March</option>
     <option value="4">April</option>
-    <option value="5">May</option>
+    <option selected="selected" value="5">May</option>
     <option value="6">June</option>
 </select>
 
@@ -26,31 +26,49 @@ function GetData(suburb, period, month) {
     xhr.send(params);
 
     var result = JSON.parse(xhr.responseText);
+
     return result;
 }
 
 function updateGraph(period, month) {
+    var _date = new Date();
+    _date.setMonth(month - 1);
+    monthName = _date.toLocaleString('en-nz', { month: "long" });
     var chart = $('#container').highcharts();
-        chart.series[0].setData(GetData('Melling', period, month)[1], false);
-        chart.series[0].update({ name: "Melling " + period }, false);
-        chart.series[1].setData(GetData('Porirua', period, month)[1], false);
-        chart.series[1].update({ name: "Porirua " + period }, false);
-        chart.series[2].setData(GetData('Petone', period, month)[1], false);
-        chart.series[2].update({ name: "Petone " + period }, false);
-        chart.series[3].setData(GetData('Manor Park', period, month)[1], false);
-        chart.series[3].update({ name: "Manor Park " + period }, false);
-        chart.series[4].setData(GetData('JVille', period, month)[1], false);
-        chart.series[4].update({ name: "JVille " + period }, false);
-        chart.series[5].setData(GetData('Paekak', period, month)[1], false);
-        chart.series[5].update({ name: "Paekak " + period }, false);
+
+    chart.series[0].setData(GetData('Melling', period, month)[1], false);
+    chart.series[0].update({ name: "Melling " + period }, false);
+    chart.series[1].setData(GetData('Porirua', period, month)[1], false);
+    chart.series[1].update({ name: "Porirua " + period }, false);
+    chart.series[2].setData(GetData('Petone', period, month)[1], false);
+    chart.series[2].update({ name: "Petone " + period }, false);
+    chart.series[3].setData(GetData('Manor Park', period, month)[1], false);
+    chart.series[3].update({ name: "Manor Park " + period }, false);
+    chart.series[4].setData(GetData('JVille', period, month)[1], false);
+    chart.series[4].update({ name: "JVille " + period }, false);
+    chart.series[5].setData(GetData('Paekak', period, month)[1], false);
+    chart.series[5].update({ name: "Paekak " + period }, false);
+    
+    chart.xAxis[0].update({ 
+        title: {
+            text: "Days in " + monthName
+        },
+    });
+
+    chart.xAxis[0].categories = GetData('Porirua', period, month)[0];
 }
 
 $(function() {
-    var month = '5';
+    var month = new Date().getMonth();
+    _date = new Date();
+    _date.setMonth(month - 1);
+    month = month.toString();
+    var monthName = _date.toLocaleString('en-nz', { month: "long" });
+    console.log(monthName);
 
     $('#container').highcharts({
         title: {
-            text: 'Average ETA',
+            text: 'Average rush hour ETA',
             x: -20 //center
         },
         subtitle: {
@@ -59,9 +77,9 @@ $(function() {
         },
         xAxis: {
             title: {
-                text: 'Days'
+                text: 'Days in ' + monthName
             },
-            categories: GetData('Melling', 'PM', '5')[0]
+            categories: GetData('Melling', 'AM', month)[0]
         },
         yAxis: {
             title: {
@@ -84,22 +102,22 @@ $(function() {
         },
         series: [{
             name: 'Melling AM',
-            data: GetData('Melling', 'AM', '5')[1]
+            data: GetData('Melling', 'AM', month)[1]
         }, {
             name: 'Porirua AM',
-            data: GetData('Porirua', 'AM', '5')[1]
+            data: GetData('Porirua', 'AM', month)[1]
         }, {
             name: 'Petone AM',
-            data: GetData('Petone', 'AM', '5')[1]
+            data: GetData('Petone', 'AM', month)[1]
         }, {
             name: 'Manor Park AM',
-            data: GetData('Manor Park', 'AM', '5')[1]
+            data: GetData('Manor Park', 'AM', month)[1]
         }, {
             name: 'JVille AM',
-            data: GetData('JVille', 'AM', '5')[1]
+            data: GetData('JVille', 'AM', month)[1]
         }, {
             name: 'Paekak AM',
-            data: GetData('Paekak', 'AM', '5')[1]
+            data: GetData('Paekak', 'AM', month)[1]
         }]
             
     });
@@ -109,9 +127,11 @@ $(function() {
         console.log($(this).val());
         if ($('#addNew').text() == "Show PM") {
             period = 'PM';
+            $('#addNew').html('Show AM'); 
         }
         else if ($('#addNew').text() == "Show AM") {
             period = 'AM';
+            $('#addNew').html('Show PM'); 
         }
         console.log(period);
         updateGraph(period, month);
@@ -144,7 +164,9 @@ $(function() {
         if (period == "AM") {
             $('#addNew').html('Show PM');
         }
+        $('#container').highcharts().yAxis[0].isDirty = true;
         $('#container').highcharts().redraw();
+
     });
 });
 </script>

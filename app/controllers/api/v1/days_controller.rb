@@ -1,4 +1,4 @@
-class Api::V1::EtasController < ApplicationController
+class Api::V1::DaysController < ApplicationController
 	respond_to :json
 	
 	def index
@@ -11,6 +11,6 @@ class Api::V1::EtasController < ApplicationController
 		#puts @params["suburb"]
 		#puts @params["period"]
 		#puts @params["month"]
-		render json: Database.return_data(@params["suburb"], @params["period"], @params["month"]), statis: 201
+		render json: Database.return_data_by_day(@params["suburb"], @params["period"], @params["month"], @params["day"]), statis: 201
 	end
 end

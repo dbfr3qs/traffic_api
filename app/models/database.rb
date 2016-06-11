@@ -6,11 +6,10 @@ class Database
 	attr_accessor :DB 
 	attr_accessor :etas
 
-	def self.return_data(suburb, period, month) # display averages for a month
+	def self.get_items(suburb)
 		@DB = Sequel.connect('sqlite://data.db')
 		@etas = @DB[:etas]
 		set = @etas.where(:suburb => suburb)
-		@month = month
 		items = Array.new
 			# create array of items (eta objects)
 		set.each do |record|
@@ -18,7 +17,32 @@ class Database
 			item = Item.new(time.day, time.month, time.year, time.hour, time.min, time.sec, record[:eta], record[:suburb])
 			items << item
 		end
-		
+		items
+	end
+
+	def self.get_day(day, month, suburb, period)
+		items = self.get_items(suburb)
+		if period == "AM"
+			items = items.select { |item| item.day == day.to_i && item.month == month.to_i && item.hour < 12 }
+		else 
+			items = items.select { |item| item.day == day.to_i && item.month == month.to_i && item.hour > 12 }
+		end	
+	end
+
+	def self.return_data_by_day(suburb, period, month, day)
+		items = self.get_day(day, month, suburb, period)
+
+		times = items.map { |item| item.hour.to_s + ":" + item.min.to_s }
+
+		items = items.map { |item| item.eta }
+
+		return times, items
+	end
+
+	def self.return_data_by_month(suburb, period, month) # display averages for a month
+		items = self.get_items(suburb)
+		@month = month
+
 		# get the days in April that we have data for
 		days = items.select { |item| item.month == @month.to_i }.map { |item| item.day.to_i }.uniq
 		days.sort!.reverse!

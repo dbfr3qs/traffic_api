@@ -17,9 +17,9 @@
 
 <script type="text/javascript">
 
-function GetData(suburb, period, month) {
+function GetDataByMonth(suburb, period, month) {
     var xhr = new XMLHttpRequest();
-    var url = "http://localhost:3000/api/v1/etas";
+    var url = "http://localhost:3000/api/v1/months";
     params = "suburb=" + suburb + "&period=" + period + "&month=" + month;
     xhr.open("POST", url, false);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -30,23 +30,38 @@ function GetData(suburb, period, month) {
     return result;
 }
 
+function GetDataByDay(suburb, period, month, day) {
+    var xhr = new XMLHttpRequest();
+    var url = "http://localhost:3000/api/v1/days";
+    params = "suburb=" + suburb + "&period=" + period + "&month=" + month +"&day=" + day;
+    xhr.open("POST", url, false);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhr.send(params);
+
+    var result = JSON.parse(xhr.responseText);
+
+    return result;
+}
+
+console.log(GetDataByDay('Porirua', 'PM', 5, '18'))
+
 function updateGraph(period, month) {
     var _date = new Date();
     _date.setMonth(month - 1);
     monthName = _date.toLocaleString('en-nz', { month: "long" });
     var chart = $('#container').highcharts();
 
-    chart.series[0].setData(GetData('Melling', period, month)[1], false);
+    chart.series[0].setData(GetDataByMonth('Melling', period, month)[1], false);
     chart.series[0].update({ name: "Melling " + period }, false);
-    chart.series[1].setData(GetData('Porirua', period, month)[1], false);
+    chart.series[1].setData(GetDataByMonth('Porirua', period, month)[1], false);
     chart.series[1].update({ name: "Porirua " + period }, false);
-    chart.series[2].setData(GetData('Petone', period, month)[1], false);
+    chart.series[2].setData(GetDataByMonth('Petone', period, month)[1], false);
     chart.series[2].update({ name: "Petone " + period }, false);
-    chart.series[3].setData(GetData('Manor Park', period, month)[1], false);
+    chart.series[3].setData(GetDataByMonth('Manor Park', period, month)[1], false);
     chart.series[3].update({ name: "Manor Park " + period }, false);
-    chart.series[4].setData(GetData('JVille', period, month)[1], false);
+    chart.series[4].setData(GetDataByMonth('JVille', period, month)[1], false);
     chart.series[4].update({ name: "JVille " + period }, false);
-    chart.series[5].setData(GetData('Paekak', period, month)[1], false);
+    chart.series[5].setData(GetDataByMonth('Paekak', period, month)[1], false);
     chart.series[5].update({ name: "Paekak " + period }, false);
     
     chart.xAxis[0].update({ 
@@ -55,7 +70,7 @@ function updateGraph(period, month) {
         },
     });
 
-    chart.xAxis[0].categories = GetData('Porirua', period, month)[0];
+    chart.xAxis[0].categories = GetDataByMonth('Porirua', period, month)[0];
 }
 
 $(function() {
@@ -79,7 +94,7 @@ $(function() {
             title: {
                 text: 'Days in ' + monthName
             },
-            categories: GetData('Melling', 'AM', month)[0]
+            categories: GetDataByMonth('Melling', 'AM', month)[0]
         },
         yAxis: {
             title: {
@@ -102,22 +117,22 @@ $(function() {
         },
         series: [{
             name: 'Melling AM',
-            data: GetData('Melling', 'AM', month)[1]
+            data: GetDataByMonth('Melling', 'AM', month)[1]
         }, {
             name: 'Porirua AM',
-            data: GetData('Porirua', 'AM', month)[1]
+            data: GetDataByMonth('Porirua', 'AM', month)[1]
         }, {
             name: 'Petone AM',
-            data: GetData('Petone', 'AM', month)[1]
+            data: GetDataByMonth('Petone', 'AM', month)[1]
         }, {
             name: 'Manor Park AM',
-            data: GetData('Manor Park', 'AM', month)[1]
+            data: GetDataByMonth('Manor Park', 'AM', month)[1]
         }, {
             name: 'JVille AM',
-            data: GetData('JVille', 'AM', month)[1]
+            data: GetDataByMonth('JVille', 'AM', month)[1]
         }, {
             name: 'Paekak AM',
-            data: GetData('Paekak', 'AM', month)[1]
+            data: GetDataByMonth('Paekak', 'AM', month)[1]
         }]
             
     });

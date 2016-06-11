@@ -31,10 +31,11 @@ class Database
 
 	def self.return_data_by_day(suburb, period, month, day)
 		items = self.get_day(day, month, suburb, period)
+		items.sort_by! { |a| [a.hour, a.min] }
 
-		times = items.map { |item| item.hour.to_s + ":" + item.min.to_s }
-
-		items = items.map { |item| item.eta }
+		times = items.map { |item| item.hour.to_s + ":" + (item.min.to_i < 10 ? "0" + item.min.to_s : item.min.to_s) }
+		
+		items = items.map { |item| item.eta.to_i }
 
 		return times, items
 	end

@@ -43,8 +43,6 @@ function GetDataByDay(suburb, period, month, day) {
     return result;
 }
 
-console.log(GetDataByDay('Porirua', 'PM', 5, '18'))
-
 function updateGraph(period, month) {
     var _date = new Date();
     _date.setMonth(month - 1);
@@ -63,7 +61,7 @@ function updateGraph(period, month) {
     chart.series[4].update({ name: "JVille " + period }, false);
     chart.series[5].setData(GetDataByMonth('Paekak', period, month)[1], false);
     chart.series[5].update({ name: "Paekak " + period }, false);
-    
+    console.log(chart.series[1]);
     chart.xAxis[0].update({ 
         title: {
             text: "Days in " + monthName
@@ -71,6 +69,39 @@ function updateGraph(period, month) {
     });
 
     chart.xAxis[0].categories = GetDataByMonth('Porirua', period, month)[0];
+}
+
+function updateGraphDay(period, month, day) {
+    
+    var chart = $('#container').highcharts();
+    
+    date = day.match(/\d+/)[0];
+    chart.xAxis[0].update({ 
+        title: {
+            text: "Time on " + day
+        },
+    });
+
+    chart.xAxis[0].categories = GetDataByDay('Porirua', period, month, date)[0];
+
+    var chart = $('#container').highcharts();
+
+    chart.series[0].setData(GetDataByDay('Melling', period, month, date)[1], false);
+
+    chart.series[0].update({ name: "Melling " + period }, false);
+    console.log(GetDataByDay('Porirua', period, month, date));
+    chart.series[1].setData(GetDataByDay('Porirua', period, month, date)[1], false);
+    console.log(GetDataByDay('Porirua', period, month, date)[1]);
+    chart.series[1].update({ name: "Porirua " + period }, false);
+    console.log(chart.series[1]);
+    chart.series[2].setData(GetDataByDay('Petone', period, month, date)[1], false);
+    chart.series[2].update({ name: "Petone " + period }, false);
+    chart.series[3].setData(GetDataByDay('Manor Park', period, month, date)[1], false);
+    chart.series[3].update({ name: "Manor Park " + period }, false);
+    chart.series[4].setData(GetDataByDay('JVille', period, month, date)[1], false);
+    chart.series[4].update({ name: "JVille " + period }, false);
+    chart.series[5].setData(GetDataByDay('Paekak', period, month, date)[1], false);
+    chart.series[5].update({ name: "Paekak " + period }, false);
 }
 
 $(function() {
@@ -105,6 +136,21 @@ $(function() {
                 width: 1,
                 color: '#808080'
             }]
+        },
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(e) {
+                            
+                            updateGraphDay('PM', month, $('#container').highcharts().xAxis[0].categories[this.x]);
+                            
+                            $('#container').highcharts().redraw();
+                        }
+                    }
+                }
+            }
         },
         tooltip: {
             valueSuffix: ' Minutes'
@@ -141,17 +187,37 @@ $(function() {
         month = $(this).val();
         console.log($(this).val());
         if ($('#addNew').text() == "Show PM") {
-            period = 'PM';
-            $('#addNew').html('Show AM'); 
+            period = 'AM';
+            //$('#addNew').html('Show AM'); 
         }
         else if ($('#addNew').text() == "Show AM") {
-            period = 'AM';
-            $('#addNew').html('Show PM'); 
+            period = 'PM';
+            //$('#addNew').html('Show PM'); 
         }
         console.log(period);
         updateGraph(period, month);
         $('#container').highcharts().redraw();
 
+    });
+
+    $(document).keyup(function(e) {
+         if (e.keyCode == 27) { // escape key maps to keycode `27`
+            
+            console.log('Escape!');
+            console.log(month);
+
+            if ($('#addNew').text() == "Show PM") {
+                period = "AM";
+            } 
+            else if ($('#addNew').text() == "Show AM") {            
+                period = "PM";
+            }
+            console.log(period);
+
+            updateGraph(period, month);
+            $('#container').highcharts().yAxis[0].isDirty = true;
+            $('#container').highcharts().redraw();  
+        }
     });
 
     $('#addNew').on('click', function(e) {

@@ -6,7 +6,7 @@ class Database
 	attr_accessor :DB 
 	attr_accessor :etas
 
-	def self.return_data(suburb, period, month)
+	def self.return_data(suburb, period, month) # display averages for a month
 		@DB = Sequel.connect('sqlite://data.db')
 		@etas = @DB[:etas]
 		set = @etas.where(:suburb => suburb)
@@ -21,6 +21,7 @@ class Database
 		
 		# get the days in April that we have data for
 		days = items.select { |item| item.month == @month.to_i }.map { |item| item.day.to_i }.uniq
+		days.sort!.reverse!
 		averages = Array.new
 		data = Array.new
 
@@ -47,7 +48,7 @@ class Database
 		days.each do |day|
 			dayNames << dayOfWeek(day) + " " + day.to_s
 		end
-
+		
 		return dayNames.reverse, averages.reverse
 	end
 end
